@@ -50,18 +50,18 @@ export default class Carousel {
     let a = this.elem.querySelector('.carousel__arrow_right');
     let b = this.elem.querySelector('.carousel__arrow_left');
     let c = this.elem.querySelector('.carousel__inner');
-    console.log(c);
-    let wMain = 958;
-    console.log(wMain);
-    let currentPosition = 1;
+
+    let elem = this.elem;
+
+    let currentPosition = 0;
     let slidesCount = this.slides.length;
     b.style.display = 'none';
 
     function slideRight() {
-      let wRight = currentPosition * wMain;
-      c.style.transform = `translateX(-${wRight}px)`;
       currentPosition++;
-      if (currentPosition === slidesCount) {
+      let offset = elem.offsetWidth * currentPosition;
+      c.style.transform = `translateX(-${offset}px)`;
+      if (currentPosition === (slidesCount - 1)) {
         a.style.display = 'none';
       } else {
         a.style.display = '';
@@ -70,10 +70,11 @@ export default class Carousel {
     }
 
     function slideLeft() {
-      let wLeft = (currentPosition - 2) * wMain;
-      c.style.transform = `translateX(-${wLeft}px)`;
       currentPosition--;
-      if (currentPosition === 1) {
+      let offset = elem.offsetWidth * currentPosition;
+
+      c.style.transform = `translateX(-${offset}px)`;
+      if (currentPosition === 0) {
         b.style.display = 'none';
       } else {
         b.style.display = '';
@@ -83,18 +84,19 @@ export default class Carousel {
 
     a.addEventListener('click', slideRight);
     b.addEventListener('click', slideLeft);
+
+    this.elem.onclick = ({ target }) => {
+      let button = target.closest('.carousel__button');
+      if (button) {
+        let id = target.closest('[data-id]').dataset.id;
+
+        this.elem.dispatchEvent(new CustomEvent('product-add', {
+          detail: id,
+          bubbles: true
+        }));
+      }
+    };
   }
 
-  addProduct() {
-    const button = this.elem.querySelectorAll('.card__button');
-    let id = this.slides.id;
-    let ev = new CustomEvent("product-add", { // имя события должно быть именно "product-add"
-      detail: id, // Уникальный идентификатора товара из объекта товара
-      bubbles: true // это событие всплывает - это понадобится в дальнейшем
-    });
-    button.addEventListener('click', function (event) {
-      button.dispatchEvent(ev);
-    });
-  }
 
 }
